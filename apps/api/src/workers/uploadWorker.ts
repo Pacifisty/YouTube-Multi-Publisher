@@ -36,7 +36,7 @@ async function processUpload(job: Job<UploadJobData>): Promise<void> {
   const { refreshToken } = account;
 
   const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
-  if (account.expiresAt < fiveMinutesFromNow) {
+  if (account.expiresAt.getTime() < fiveMinutesFromNow.getTime()) {
     await addLog(targetId, 'INFO', 'Access token expired, refreshing...');
     const refreshed = await refreshAccessToken(refreshToken);
     accessToken = refreshed.accessToken;

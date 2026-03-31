@@ -30,9 +30,12 @@ export default function CampaignDetailPage({ params }: { params: { id: string } 
     if (!token) { router.push('/login'); return; }
     loadCampaign();
 
+    const TERMINAL_STATES = ['COMPLETED', 'FAILED'];
+    if (campaign && TERMINAL_STATES.includes(campaign.status)) return;
+
     const interval = setInterval(loadCampaign, 5000);
     return () => clearInterval(interval);
-  }, [router, loadCampaign]);
+  }, [router, loadCampaign, campaign?.status]);
 
   async function handlePublish() {
     setPublishing(true);

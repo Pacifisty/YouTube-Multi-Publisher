@@ -8,7 +8,7 @@ const router = Router();
 
 const LoginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(8),
 });
 
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
