@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model YoutubeAccount {
+  id           String           @id @default(cuid())
+  googleId     String           @unique
+  email        String
+  displayName  String
+  accessToken  String           @db.Text
+  refreshToken String           @db.Text
+  expiresAt    DateTime
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  channels     YoutubeChannel[]
+}
+
+model YoutubeChannel {
+  id          String           @id @default(cuid())
+  channelId   String           @unique
+  title       String
+  description String?
+  thumbnail   String?
+  accountId   String
+  account     YoutubeAccount   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  targets     CampaignTarget[]
+}
+
+model MediaFile {
+  id        String     @id @default(cuid())
+  filename  String
+  filePath  String
+  fileSize  BigInt
+  mimeType  String
+  duration  Int?
+  createdAt DateTime   @default(now())
+  campaigns Campaign[]
+}
+
+model Campaign {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  mediaFileId String
+  mediaFile   MediaFile        @relation(fields: [mediaFileId], references: [id])
+  status      CampaignStatus   @default(DRAFT)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  targets     CampaignTarget[]
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model CampaignTarget {
+  id             String         @id @default(cuid())
+  campaignId     String
+  campaign       Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  channelId      String
+  channel        YoutubeChannel @relation(fields: [channelId], references: [id])
+  title          String
+  description    String         @db.Text
+  tags           String[]
+  privacy        Privacy        @default(PUBLIC)
+  publishAt      DateTime?
+  thumbnailPath  String?
+  playlistId     String?
+  status         JobStatus      @default(PENDING)
+  youtubeVideoId String?
+  errorMessage   String?
+  retries        Int            @default(0)
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  logs           JobLog[]
+}
+
+enum Privacy {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  PUBLISHED
+  FAILED
+}
+
+model JobLog {
+  id        String         @id @default(cuid())
+  targetId  String
+  target    CampaignTarget @relation(fields: [targetId], references: [id], onDelete: Cascade)
+  level     LogLevel       @default(INFO)
+  message   String         @db.Text
+  createdAt DateTime       @default(now())
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+}
