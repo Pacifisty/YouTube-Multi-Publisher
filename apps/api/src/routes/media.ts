@@ -93,7 +93,7 @@ router.post('/:id/thumbnail', requireAuth, thumbnailUpload.single('thumbnail'), 
 router.get('/', requireAuth, async (_req: Request, res: Response): Promise<void> => {
   try {
     const files = await prisma.mediaFile.findMany({ orderBy: { createdAt: 'desc' } });
-    res.json(files.map((f) => ({ ...f, fileSize: f.fileSize.toString() })));
+    res.json(files.map((f: { fileSize: bigint; [key: string]: unknown }) => ({ ...f, fileSize: f.fileSize.toString() })));
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

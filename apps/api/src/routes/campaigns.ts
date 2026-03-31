@@ -6,6 +6,11 @@ import { enqueueUpload } from '../services/queue';
 
 const router = Router();
 
+type CampaignWithMedia = {
+  mediaFile: { fileSize: bigint; [key: string]: unknown };
+  [key: string]: unknown;
+};
+
 const TargetSchema = z.object({
   channelId: z.string(),
   title: z.string().min(1).max(100),
@@ -33,7 +38,7 @@ router.get('/', requireAuth, async (_req: Request, res: Response): Promise<void>
       },
       orderBy: { createdAt: 'desc' },
     });
-    res.json(campaigns.map((c) => ({
+    res.json(campaigns.map((c: CampaignWithMedia) => ({
       ...c,
       mediaFile: { ...c.mediaFile, fileSize: c.mediaFile.fileSize.toString() },
     })));
@@ -127,7 +132,7 @@ router.post('/:id/publish', requireAuth, async (req: Request, res: Response): Pr
       return;
     }
 
-    const pendingTargets = campaign.targets.filter((t) => t.status === 'PENDING');
+    const pendingTargets = campaign.targets.filter((t: { status: string }) => t.status === 'PENDING');
     if (pendingTargets.length === 0) {
       res.status(400).json({ error: 'No pending targets to publish' });
       return;
@@ -139,7 +144,7 @@ router.post('/:id/publish', requireAuth, async (req: Request, res: Response): Pr
     });
 
     const jobIds = await Promise.all(
-      pendingTargets.map((target) =>
+      pendingTargets.map((target: { id: string }) =>
         enqueueUpload({ targetId: target.id, campaignId: campaign.id })
       )
     );

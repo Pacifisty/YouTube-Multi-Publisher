@@ -4,7 +4,7 @@ import { redisConnection, UploadJobData } from '../services/queue';
 import { prisma } from '../prisma';
 import { buildAuthClient, refreshAccessToken } from '../services/oauth';
 import { uploadVideo, setThumbnail, addToPlaylist } from '../services/youtube';
-import { Privacy } from '@prisma/client';
+type Privacy = 'PUBLIC' | 'UNLISTED' | 'PRIVATE';
 
 async function addLog(targetId: string, level: 'INFO' | 'WARN' | 'ERROR', message: string) {
   await prisma.jobLog.create({ data: { targetId, level, message } });
@@ -63,7 +63,7 @@ async function processUpload(job: Job<UploadJobData>): Promise<void> {
     title: target.title,
     description: target.description,
     tags: target.tags,
-    privacy: privacyMap[target.privacy],
+    privacy: privacyMap[target.privacy as Privacy],
     publishAt: target.publishAt || undefined,
     playlistId: target.playlistId || undefined,
   });
@@ -97,8 +97,8 @@ async function processUpload(job: Job<UploadJobData>): Promise<void> {
 
   // Update campaign status if all targets are done
   const allTargets = await prisma.campaignTarget.findMany({ where: { campaignId: target.campaignId } });
-  const allDone = allTargets.every((t) => t.status === 'PUBLISHED' || t.status === 'FAILED');
-  const anyFailed = allTargets.some((t) => t.status === 'FAILED');
+  const allDone = allTargets.every((t: { status: string }) => t.status === 'PUBLISHED' || t.status === 'FAILED');
+  const anyFailed = allTargets.some((t: { status: string }) => t.status === 'FAILED');
 
   if (allDone) {
     await prisma.campaign.update({

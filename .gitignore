@@ -9,3 +9,4 @@ prisma/migrations/
 *.db-journal
 .DS_Store
 *.log
+*.tsbuildinfo
