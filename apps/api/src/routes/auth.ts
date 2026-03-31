@@ -21,7 +21,13 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret', {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is not set' });
+      return;
+    }
+
+    const token = jwt.sign({ userId: user.id }, jwtSecret, {
       expiresIn: '7d',
     });
 
@@ -52,7 +58,13 @@ router.post('/setup', async (req: Request, res: Response): Promise<void> => {
     const hashed = await bcrypt.hash(body.password, 12);
     const user = await prisma.user.create({ data: { email: body.email, password: hashed } });
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret', {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is not set' });
+      return;
+    }
+
+    const token = jwt.sign({ userId: user.id }, jwtSecret, {
       expiresIn: '7d',
     });
 

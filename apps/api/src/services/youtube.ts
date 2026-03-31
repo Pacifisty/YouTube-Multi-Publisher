@@ -59,7 +59,7 @@ export async function uploadVideo(params: UploadParams): Promise<string> {
           title: params.title,
           description: params.description,
           tags: params.tags,
-          categoryId: '22',
+          categoryId: '22', // "People & Blogs" — configurable per target in future iterations
         },
         status,
       },

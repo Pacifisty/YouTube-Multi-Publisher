@@ -13,8 +13,13 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
   }
 
   const token = authHeader.slice(7);
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is not set' });
+    return;
+  }
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { userId: string };
+    const payload = jwt.verify(token, jwtSecret) as { userId: string };
     req.userId = payload.userId;
     next();
   } catch {

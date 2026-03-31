@@ -81,7 +81,7 @@ export default function UploadPage() {
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎬</div>
               <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Drop your video here</div>
               <div style={{ color: '#888', fontSize: '0.875rem' }}>or click to browse</div>
-              <div style={{ color: '#aaa', fontSize: '0.8rem', marginTop: '0.5rem' }}>Supports all video formats up to 256GB</div>
+              <div style={{ color: '#aaa', fontSize: '0.8rem', marginTop: '0.5rem' }}>Supports MP4, MOV, AVI, WebM and other video formats up to 256GB</div>
             </div>
 
             <input ref={fileInputRef} type="file" accept="video/*" onChange={handleInputChange} style={{ display: 'none' }} />
