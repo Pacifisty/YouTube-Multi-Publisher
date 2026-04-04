@@ -43,9 +43,7 @@ Edit `.env` with your values:
 ### 3. Database
 
 ```bash
-cd apps/api
-npx prisma migrate dev --name init
-npx prisma generate
+npm run db:migrate -- --name init
 ```
 
 ### 4. Run

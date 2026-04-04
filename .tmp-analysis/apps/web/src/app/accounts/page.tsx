@@ -1,12 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { api, YoutubeAccount } from '@/lib/api';
 import AppShell from '../_components/AppShell';
 
 export default function AccountsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [accounts, setAccounts] = useState<YoutubeAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
@@ -16,13 +15,14 @@ export default function AccountsPage() {
     const token = localStorage.getItem('token');
     if (!token) { router.push('/login'); return; }
 
+    const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get('connected')) setMessage('YouTube account connected successfully!');
     if (searchParams.get('error')) setMessage('Failed to connect YouTube account. Please try again.');
 
     api.accounts.list()
       .then(setAccounts)
       .finally(() => setLoading(false));
-  }, [router, searchParams]);
+  }, [router]);
 
   async function handleConnect() {
     setConnecting(true);

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { api, MediaFile, YoutubeChannel } from '@/lib/api';
 import AppShell from '../../_components/AppShell';
 
@@ -14,7 +14,6 @@ interface TargetForm {
 
 export default function NewCampaignPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [channels, setChannels] = useState<YoutubeChannel[]>([]);
   const [campaignTitle, setCampaignTitle] = useState('');
@@ -30,6 +29,7 @@ export default function NewCampaignPage() {
     const token = localStorage.getItem('token');
     if (!token) { router.push('/login'); return; }
 
+    const searchParams = new URLSearchParams(window.location.search);
     const preselectedMedia = searchParams.get('mediaId');
 
     Promise.all([api.media.list(), api.accounts.list()]).then(([files, accounts]) => {
@@ -38,7 +38,7 @@ export default function NewCampaignPage() {
       setChannels(allChannels);
       if (preselectedMedia) setSelectedMedia(preselectedMedia);
     }).finally(() => setLoading(false));
-  }, [router, searchParams]);
+  }, [router]);
 
   const toggleChannel = useCallback((channelId: string) => {
     setSelectedChannels((prev) => {

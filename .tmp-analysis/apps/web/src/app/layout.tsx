@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'YouTube Multi-Publisher',
   description: 'Publish videos to multiple YouTube channels at once',

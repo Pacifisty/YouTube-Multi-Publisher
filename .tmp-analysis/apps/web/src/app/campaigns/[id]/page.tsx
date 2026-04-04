@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { api, Campaign, JobLog } from '@/lib/api';
 import AppShell from '../../_components/AppShell';
 
@@ -11,7 +11,9 @@ const statusColor: Record<string, string> = {
   FAILED: '#F44336',
 };
 
-export default function CampaignDetailPage({ params }: { params: { id: string } }) {
+export default function CampaignDetailPage() {
+  const params = useParams<{ id: string }>();
+  const campaignId = params?.id;
   const router = useRouter();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,10 +22,15 @@ export default function CampaignDetailPage({ params }: { params: { id: string } 
   const [loadingLogs, setLoadingLogs] = useState<Set<string>>(new Set());
 
   const loadCampaign = useCallback(() => {
-    api.campaigns.get(params.id)
+    if (!campaignId) {
+      setLoading(false);
+      return;
+    }
+
+    api.campaigns.get(campaignId)
       .then(setCampaign)
       .finally(() => setLoading(false));
-  }, [params.id]);
+  }, [campaignId]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -38,9 +45,11 @@ export default function CampaignDetailPage({ params }: { params: { id: string } 
   }, [router, loadCampaign, campaign?.status]);
 
   async function handlePublish() {
+    if (!campaignId) return;
+
     setPublishing(true);
     try {
-      await api.campaigns.publish(params.id);
+      await api.campaigns.publish(campaignId);
       loadCampaign();
     } catch (err) {
       alert((err as Error).message);

@@ -4,10 +4,10 @@
   "private": true,
   "workspaces": ["apps/*"],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
-    "build": "npm run build -w apps/api && npm run build -w apps/web",
-    "db:migrate": "prisma migrate dev",
-    "db:generate": "prisma generate"
+    "dev": "npm run db:generate && concurrently \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "build": "npm run db:generate && npm run build -w apps/api && npm run build -w apps/web",
+    "db:migrate": "prisma migrate dev --schema apps/api/prisma/schema.prisma",
+    "db:generate": "prisma generate --schema apps/api/prisma/schema.prisma"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

@@ -10,7 +10,7 @@ const navItems = [
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '';
 
   function handleLogout() {
     localStorage.removeItem('token');
